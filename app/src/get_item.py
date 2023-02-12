@@ -5,20 +5,20 @@ dynamodb = boto3.resource('dynamodb')
 
 
 def lambda_handler(event, context):
-    task_id = json.loads(event['body'])['id']
+    data = json.loads(event)
+    print(data)
+    item_id = json.loads(event['body'])['code']
 
-    table = dynamodb.Table('Tasks')
+    table = dynamodb.Table('matrix')
 
-    table.delete_item(
+    response = table.get_item(
         Key={
-            'id': str(task_id)
+            'code': item_id
         }
     )
     return {
         'statusCode': 200,
-        'body': json.dumps({
-            "message": "task deleted!"
-        }),
+        'body': json.dumps(response),
         'headers': {
             'Content-Type': "application/json",
             'Access-Control-Allow-Origin': '*'
@@ -27,15 +27,4 @@ def lambda_handler(event, context):
     }
 
 
-def lambda_handler(event, context):
-
-    dynamodb = boto3.resource('dynamodb')
-
-    table = dynamodb.Table('Tasks')
-
-    response = table.scan()
-
-    return {
-        'statusCode': 200,
-        'body': json.dumps(response)
-    }
+lambda_handler()
